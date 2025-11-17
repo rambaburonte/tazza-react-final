@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useHome } from '../context/HomeContext';
 
 const DealsBanner = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -8,6 +9,10 @@ const DealsBanner = () => {
     minutes: 0,
     seconds: 0
   });
+  const { homeData } = useHome();
+
+  const offerProduct = homeData?.inOffers?.[0];
+  const bannerImage =  "/assets/img/banner/banner-layer.png";
 
   useEffect(() => {
     const targetDate = new Date('Sep 30, 2026 00:00:00').getTime();
@@ -42,7 +47,7 @@ const DealsBanner = () => {
                 Grab The Best Offer of This Week
               </h2>
               <p className="deals__banner--content__desc">
-                Shop our selection of organic fresh vegetables in a discounted price. 10% off on all vegetables.
+                {offerProduct ? `Special offer on ${offerProduct.name} at $${offerProduct.price}. ${offerProduct.old_price ? `Was $${offerProduct.old_price}.` : ''} 10% off on all vegetables.` : 'Shop our selection of organic fresh vegetables in a discounted price. 10% off on all vegetables.'}
               </p>
               <div className="deals__banner--countdown d-flex">
                 <div className="countdown__item">
@@ -70,8 +75,8 @@ const DealsBanner = () => {
               <Link className="banner__items--thumbnail display-block" to="/shop">
                 <img 
                   className="banner__items--thumbnail__img display-block" 
-                  src="/assets/img/banner/banner-layer.png" 
-                  alt="banner-layer-img" 
+                  src={bannerImage} 
+                  alt="banner-layer-img"
                 />
               </Link>
             </div>

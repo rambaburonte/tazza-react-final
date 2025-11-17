@@ -1,5 +1,4 @@
 import React from 'react';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
@@ -9,7 +8,6 @@ import Footer from '../components/Footer';
 const AboutPage = () => {
   return (
     <>
-      <Preloader />
       <Header />
 
       <main className="main__content_wrapper">
@@ -70,22 +68,22 @@ const AboutPage = () => {
                   <div className="counterup__banner--items text-center">
                     <h2 className="counterup__banner--items__text text-white">YEARS OF <br />
                       FOUNDATION</h2>
-                    <span className="counterup__banner--items__number text-white">50</span>
+                    <span className="counterup__banner--items__number js-counter text-white" data-count="50">0</span>
                   </div>
                   <div className="counterup__banner--items text-center">
                     <h2 className="counterup__banner--items__text text-white">SKILLED TEAM <br />
                       MEMBERS </h2>
-                    <span className="counterup__banner--items__number text-white">100</span>
+                    <span className="counterup__banner--items__number js-counter text-white" data-count="100">0</span>
                   </div>
                   <div className="counterup__banner--items text-center">
                     <h2 className="counterup__banner--items__text text-white">HAPPY <br />
                       CUSTOMERS</h2>
-                    <span className="counterup__banner--items__number text-white">80</span>
+                    <span className="counterup__banner--items__number js-counter text-white" data-count="80">0</span>
                   </div>
                   <div className="counterup__banner--items text-center">
                     <h2 className="counterup__banner--items__text text-white">MONTHLY <br />
                       ORDERS</h2>
-                    <span className="counterup__banner--items__number text-white">70</span>
+                    <span className="counterup__banner--items__number js-counter text-white" data-count="70">0</span>
                   </div>
                 </div>
               </div>

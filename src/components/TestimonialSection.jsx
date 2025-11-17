@@ -9,21 +9,28 @@ const TestimonialSection = () => {
       name: 'JACKLY SMITH',
       position: 'Senior Manager',
       image: 'testimonial-thumb1.png',
-      description: 'Lorem ipsum dolor sit, amet consectetur is adipisicing elit. Recusandae iusto veritatis eveniet, amet sint are suscipit!'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt dolor sit amet, consectetur'
     },
     {
       id: 2,
       name: 'Laura Johnson',
       position: 'Products Manager',
       image: 'testimonial-thumb2.png',
-      description: 'Lorem ipsum dolor sit, amet consectetur is adipisicing elit. Recusandae iusto veritatis eveniet, amet sint are suscipit!'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt dolor sit amet, consectetur'
     },
     {
       id: 3,
       name: 'Richard Smith',
       position: 'CEO - Founder',
       image: 'testimonial-thumb3.png',
-      description: 'Lorem ipsum dolor sit, amet consectetur is adipisicing elit. Recusandae iusto veritatis eveniet, amet sint are suscipit!'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt dolor sit amet, consectetur'
+    },
+    {
+      id: 4,
+      name: 'JACKLY SMITH',
+      position: 'Senior Manager',
+      image: 'testimonial-thumb1.png',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt dolor sit amet, consectetur'
     }
   ];
 
@@ -36,7 +43,7 @@ const TestimonialSection = () => {
   return (
     <section className="testimonial__section testimonial__bg section--padding">
       <div className="container-fluid p-0">
-        <div className="section__heading text-center mb-55">
+        <div className="section__heading text-center mb-40">
           <span className="section__heading--subtitle">Recently added our store</span>
           <h2 className="section__heading--maintitle">Our Testimonial</h2>
         </div>

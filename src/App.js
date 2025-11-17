@@ -1,5 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CategoriesProvider } from './context/CategoriesContext';
+import { HomeProvider } from './context/HomeContext';
+import { ProductsProvider } from './context/ProductsContext';
+import Preloader from './components/Preloader';
 
 // Import Pages
 import HomePage from './pages/HomePage';
@@ -18,28 +22,36 @@ import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/shop-grid" element={<ShopPage />} />
-        <Route path="/shop-list" element={<ShopPage />} />
-        <Route path="/shop-grid-list" element={<ShopPage />} />
-        <Route path="/product-detail" element={<ProductDetailPage />} />
-        <Route path="/product-video" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-        <Route path="/compare" element={<ComparePage />} />
-        <Route path="/my-account" element={<MyAccountPage />} />
-        <Route path="/my-account-2" element={<MyAccountPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
+    <CategoriesProvider>
+      <HomeProvider>
+        <Preloader />
+        <ProductsProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/shop-grid" element={<ShopPage />} />
+              <Route path="/shop-list" element={<ShopPage />} />
+              <Route path="/shop-grid-list" element={<ShopPage />} />
+              <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="/product-detail" element={<ProductDetailPage />} />
+              <Route path="/product-video" element={<ProductDetailPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/compare" element={<ComparePage />} />
+              <Route path="/my-account" element={<MyAccountPage />} />
+              <Route path="/my-account-2" element={<MyAccountPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Router>
+        </ProductsProvider>
+      </HomeProvider>
+    </CategoriesProvider>
   );
 }
 

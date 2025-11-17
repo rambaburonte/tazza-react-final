@@ -1,10 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
@@ -111,7 +106,6 @@ const WishlistPage = () => {
 
   return (
     <>
-      <Preloader />
       <Header />
 
       <main className="main__content_wrapper">

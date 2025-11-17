@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
@@ -47,28 +46,27 @@ const CartPage = () => {
 
   return (
     <>
-      <Preloader />
       <Header />
 
       <main className="main__content_wrapper">
         <Breadcrumb title="Shopping Cart" items={[{ label: 'Shopping Cart' }]} />
 
         <section className="cart__section section--padding">
-          <div className="container">
+            <div className="container-fluid">
             <div className="cart__section--inner">
-              <form>
-                <h2 className="cart__title mb-40">Shopping Cart</h2>
+              <h2 className="cart__title mb-40">Shopping Cart</h2>
+              <form action="#">
                 <div className="row">
                   <div className="col-lg-8">
                     <div className="cart__table">
                       <table className="cart__table--inner">
                         <thead className="cart__table--header">
-                          <tr>
-                            <th className="cart__table--header__items">Product</th>
-                            <th className="cart__table--header__items">Price</th>
-                            <th className="cart__table--header__items">Quantity</th>
-                            <th className="cart__table--header__items">Total</th>
-                          </tr>
+                            <tr className="cart__table--header__items">
+                                <th className="cart__table--header__list">Product</th>
+                                <th className="cart__table--header__list">Price</th>
+                                <th className="cart__table--header__list">Quantity</th>
+                                <th className="cart__table--header__list">Total</th>
+                            </tr>
                         </thead>
                         <tbody className="cart__table--body">
                           {cartItems.map((item) => (
@@ -91,40 +89,25 @@ const CartPage = () => {
                                     <h4 className="cart__content--title">
                                       <Link to="/product-detail">{item.name}</Link>
                                     </h4>
+                                    <span className="cart__content--variant">COLOR: Blue</span>
+                                    <span className="cart__content--variant">WEIGHT: 2 Kg</span>
                                   </div>
                                 </div>
                               </td>
                               <td className="cart__table--body__list">
-                                <span className="cart__price">${item.price.toFixed(2)}</span>
+                                <span className="cart__price">£{item.price.toFixed(2)}</span>
                               </td>
                               <td className="cart__table--body__list">
                                 <div className="quantity__box">
-                                  <button
-                                    type="button"
-                                    className="quantity__value decrease"
-                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  >
-                                    -
-                                  </button>
+                                  <button type="button" className="quantity__value quickview__value--quantity decrease" aria-label="quantity value" value="Decrease Value" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
                                   <label>
-                                    <input
-                                      type="number"
-                                      className="quantity__number"
-                                      value={item.quantity}
-                                      onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                                    />
+                                    <input type="number" className="quantity__number quickview__value--number" value={item.quantity} onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)} data-counter />
                                   </label>
-                                  <button
-                                    type="button"
-                                    className="quantity__value increase"
-                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  >
-                                    +
-                                  </button>
+                                  <button type="button" className="quantity__value quickview__value--quantity increase" aria-label="quantity value" value="Increase Value" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                                 </div>
                               </td>
                               <td className="cart__table--body__list">
-                                <span className="cart__price">${(item.price * item.quantity).toFixed(2)}</span>
+                                <span className="cart__price end">£{(item.price * item.quantity).toFixed(2)}</span>
                               </td>
                             </tr>
                           ))}
@@ -138,56 +121,41 @@ const CartPage = () => {
                   </div>
                   <div className="col-lg-4">
                     <div className="cart__summary border-radius-10">
-                      <div className="cart__summary--inner">
-                        <div className="coupon__code mb-30">
-                          <h3 className="coupon__code--title">Coupon Code</h3>
-                          <form className="coupon__code--form">
-                            <label>
-                              <input
-                                className="coupon__code--input"
-                                placeholder="Enter code here"
-                                type="text"
-                                value={couponCode}
-                                onChange={(e) => setCouponCode(e.target.value)}
-                              />
-                            </label>
-                            <button className="coupon__code--button" type="submit">Apply Code</button>
-                          </form>
+                      <div className="coupon__code mb-30">
+                        <h3 className="coupon__code--title">Coupon</h3>
+                        <p className="coupon__code--desc">Enter your coupon code if you have one.</p>
+                        <div className="coupon__code--field d-flex">
+                          <label>
+                            <input className="coupon__code--field__input border-radius-5" placeholder="Coupon code" type="text" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                          </label>
+                          <button className="coupon__code--field__btn btn" type="submit">Apply Coupon</button>
                         </div>
-                        <div className="cart__note mb-20">
-                          <h3 className="cart__note--title">Note</h3>
-                          <div className="cart__note--area">
-                            <label>
-                              <textarea
-                                className="cart__note--textarea"
-                                placeholder="Write a note here..."
-                                value={note}
-                                onChange={(e) => setNote(e.target.value)}
-                              ></textarea>
-                            </label>
-                          </div>
-                        </div>
-                        <h3 className="cart__summary--title mb-20">Cart Totals</h3>
-                        <ul className="cart__summary--list">
-                          <li className="cart__summary--list__items d-flex justify-content-between">
-                            <span className="cart__summary--list__title">SUBTOTAL</span>
-                            <span className="cart__summary--list__price">${subtotal.toFixed(2)}</span>
-                          </li>
-                          <li className="cart__summary--list__items d-flex justify-content-between">
-                            <span className="cart__summary--list__title">SHIPPING</span>
-                            <span className="cart__summary--list__price">${shipping.toFixed(2)}</span>
-                          </li>
-                          <li className="cart__summary--list__items d-flex justify-content-between">
-                            <span className="cart__summary--list__title">TOTAL</span>
-                            <span className="cart__summary--list__price">${total.toFixed(2)}</span>
-                          </li>
+                      </div>
+                      <div className="cart__note mb-20">
+                        <h3 className="cart__note--title">Note</h3>
+                        <p className="cart__note--desc">Add special instructions for your seller...</p>
+                        <textarea className="cart__note--textarea border-radius-5" value={note} onChange={(e) => setNote(e.target.value)}></textarea>
+                      </div>
+                      <div className="cart__summary--total mb-20">
+                        <table className="cart__summary--total__table">
+                          <tbody>
+                            <tr className="cart__summary--total__list">
+                              <td className="cart__summary--total__title text-left">SUBTOTAL</td>
+                              <td className="cart__summary--amount text-right">${subtotal.toFixed(2)}</td>
+                            </tr>
+                            <tr className="cart__summary--total__list">
+                              <td className="cart__summary--total__title text-left">GRAND TOTAL</td>
+                              <td className="cart__summary--amount text-right">${total.toFixed(2)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="cart__summary--footer">
+                        <p className="cart__summary--footer__desc">Shipping & taxes calculated at checkout</p>
+                        <ul className="d-flex justify-content-between">
+                          <li><button className="cart__summary--footer__btn btn cart" type="submit">Update Cart</button></li>
+                          <li><Link className="cart__summary--footer__btn btn checkout" to="/checkout">Check Out</Link></li>
                         </ul>
-                        <div className="cart__summary--button d-flex justify-content-between">
-                          <button className="cart__summary--button__update btn" type="button">Update Cart</button>
-                          <Link className="cart__summary--button__checkout btn" to="/checkout">
-                            Proceed To Checkout
-                          </Link>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -197,72 +165,120 @@ const CartPage = () => {
           </div>
         </section>
 
-        <section className="new__product--section section--padding">
-          <div className="container">
-            <div className="section__heading text-center mb-50">
-              <h2 className="section__heading--maintitle">New Products</h2>
-            </div>
-            <div className="new__product--inner">
-              <div className="swiper newProductSwiper">
-                <div className="swiper-wrapper">
-                  <Swiper
-                    modules={[Navigation]}
-                    spaceBetween={30}
-                    slidesPerView={4}
-                    navigation={{
-                      nextEl: '.swiper-button-next',
-                      prevEl: '.swiper-button-prev',
-                    }}
-                    breakpoints={{
-                      320: { slidesPerView: 1 },
-                      480: { slidesPerView: 2 },
-                      768: { slidesPerView: 3 },
-                      992: { slidesPerView: 4 },
-                    }}
-                  >
-                    {newProducts.map((product) => (
-                      <SwiperSlide key={product.id}>
-                        <div className="new__product--items">
-                          <div className="product__card--container">
-                            <div className="product__card--thumbnail">
-                              <Link className="product__card--thumbnail__link display-block" to="/product-detail">
-                                <img className="product__card--thumbnail__img product__primary--img" src={`/assets/img/product/${product.image}`} alt={product.name} />
-                              </Link>
-                              <span className="product__badge--items">
-                                <span className="product__badge--item__text">New</span>
-                              </span>
-                            </div>
-                            <div className="product__card--content">
-                              <h3 className="product__card--content__title">
-                                <Link to="/product-detail">{product.name}</Link>
-                              </h3>
-                              <div className="product__card--price">
-                                <span className="current__price">${product.price.toFixed(2)}</span>
-                                <span className="price__divider">|</span>
-                                <span className="old__price">${product.originalPrice.toFixed(2)}</span>
-                              </div>
-                              <div className="product__card--rating">
-                                {[...Array(5)].map((_, i) => (
-                                  <span key={i} className={`rating__icon ${i < product.rating ? 'rating__icon--solid' : ''}`}>
-                                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M5.5 0L7.05 3.55L11 4.1L8.1 6.9L8.8 10.8L5.5 9.05L2.2 10.8L2.9 6.9L0 4.1L3.95 3.55L5.5 0Z" fill="currentColor"/>
-                                    </svg>
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
+        <section className="product__section product__section--style3 section--padding pt-0">
+            <div className="container-fluid">
+                <div className="section__heading3 mb-40">
+                    <h2 className="section__heading3--maintitle">New Products</h2>
                 </div>
-                <div className="swiper-button-next"></div>
-                <div className="swiper-button-prev"></div>
+                <div className="product__section--inner product3__section--inner__padding product__section--style3__inner product__column6--activation swiper">
+                    <div className="swiper-wrapper">
+                        <Swiper
+                            modules={[Navigation]}
+                            spaceBetween={30}
+                            slidesPerView={4}
+                            navigation={{
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            }}
+                            breakpoints={{
+                                320: { slidesPerView: 1 },
+                                480: { slidesPerView: 2 },
+                                768: { slidesPerView: 3 },
+                                992: { slidesPerView: 4 },
+                            }}
+                        >
+                            {newProducts.map((product) => (
+                                <SwiperSlide key={product.id}>
+                                    <div className="product__items product__items2">
+                                        <div className="product__items--thumbnail">
+                                            <Link className="product__items--link" to="/product-detail">
+                                                <img className="product__items--img product__primary--img" src={`/assets/img/product/${product.image}`} alt="product-img" />
+                                                <img className="product__items--img product__secondary--img" src={`/assets/img/product/${product.image}`} alt="product-img" />
+                                            </Link>
+                                            <div className="product__badge">
+                                                <span className="product__badge--items sale">Sale</span>
+                                            </div>
+                                            <ul className="product__items--action">
+                                                <li className="product__items--action__list">
+                                                    <Link className="product__items--action__btn" to="/wishlist">
+                                                        <svg className="product__items--action__btn--svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                            <path d="M352.92 80C288 80 256 144 256 144s-32-64-96.92-64c-52.76 0-94.54 44.14-95.08 96.81-1.1 109.33 86.73 187.08 183 252.42a16 16 0 0018 0c96.26-65.34 184.09-143.09 183-252.42-.54-52.67-42.32-96.81-95.08-96.81z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
+                                                        </svg>
+                                                        <span className="visually-hidden">Wishlist</span>
+                                                    </Link>
+                                                </li>
+                                                <li className="product__items--action__list">
+                                                    <button className="product__items--action__btn" data-open="modal1">
+                                                        <svg className="product__items--action__btn--svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
+                                                            <path fill="none" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="32" d="M338.29 338.29L448 448"/>
+                                                        </svg>
+                                                        <span className="visually-hidden">Quick View</span>
+                                                    </button>
+                                                </li>
+                                                <li className="product__items--action__list">
+                                                    <Link className="product__items--action__btn" to="/compare">
+                                                        <svg className="product__items--action__btn--svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                            <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M400 304l48 48-48 48M400 112l48 48-48 48M64 352h85.19a80 80 0 0066.56-35.62L256 256"/>
+                                                            <path d="M64 160h85.19a80 80 0 0166.56 35.62l80.5 120.76A80 80 0 00362.81 352H416M416 160h-53.19a80 80 0 00-66.56 35.62L288 208" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
+                                                        </svg>
+                                                        <span className="visually-hidden">Compare</span>
+                                                    </Link>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div className="product__items--content product__items2--content text-center">
+                                            <Link className="add__to--cart__btn" to="/cart">+ Add to cart</Link>
+                                            <h3 className="product__items--content__title h4">
+                                                <Link to="/product-detail">{product.name}</Link>
+                                            </h3>
+                                            <div className="product__items--price">
+                                                <span className="current__price">${product.price.toFixed(2)}</span>
+                                                <span className="old__price">${product.originalPrice.toFixed(2)}</span>
+                                            </div>
+                                            <div className="product__items--rating d-flex justify-content-center align-items-center">
+                                                <ul className="d-flex">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <li key={i} className="product__items--rating__list">
+                                                            <span className="product__items--rating__icon">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="10.105" height="9.732" viewBox="0 0 10.105 9.732">
+                                                                    <path data-name="star - Copy" d={`M9.837,3.5,6.73,3.039,5.338.179a.335.335,0,0,0-.571,0L3.375,3.039.268,3.5a.3.3,0,0,0-.178.514L2.347,6.242,1.813,9.4a.314.314,0,0,0,.464.316L5.052,8.232,7.827,9.712A.314.314,0,0,0,8.292,9.4L7.758,6.242l2.257-2.231A.3.3,0,0,0,9.837,3.5Z`} transform="translate(0 -0.018)" fill={i < product.rating ? "currentColor" : "#c7c5c2"} />
+                                                                </svg>
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <span className="product__items--rating__count--number">(24)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div className="brand__logo--section section--padding pt-0">
+          <div className="container">
+            <div className="row row-cols-1">
+              <div className="col">
+                <div className="brand__logo--section__inner d-flex justify-content-between align-items-center">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <div key={num} className="brand__logo--items">
+                      <img
+                        className="brand__logo--items__thumbnail--img display-block"
+                        src={`/assets/img/logo/brand-logo${num}.png`}
+                        alt="brand img"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <ShippingInfo />
       </main>

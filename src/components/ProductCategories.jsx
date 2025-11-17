@@ -4,15 +4,76 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { API_CONFIG } from '../config/apiConfig';
+import { useHome } from '../context/HomeContext';
 
 const ProductCategories = () => {
-  const categories = [
-    { id: 1, name: 'Raw-steak', items: 99, image: 'categories1.png' },
-    { id: 2, name: 'Broccoli', items: 88, image: 'categories2.png' },
-    { id: 3, name: 'Cabbage', items: 90, image: 'categories3.png' },
-    { id: 4, name: 'Raw-onions', items: 92, image: 'categories4.png' },
-    { id: 5, name: 'Broccoli', items: 88, image: 'categories2.png' }
-  ];
+  const { homeData, loading, error } = useHome();
+  const { categories } = homeData;
+
+  // Map categories for display
+  const mappedCategories = categories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    image: cat.cover,
+    items: cat.subCates ? cat.subCates.length : 0
+  }));
+
+  if (loading) {
+    return (
+      <section className="product__section product__categories--section section--padding">
+        <div className="container">
+          <div className="section__heading text-center mb-40">
+            <span className="section__heading--subtitle">Recently added our store</span>
+            <h2 className="section__heading--maintitle">Our Hottest Categories</h2>
+          </div>
+          <div className="text-center">Loading categories...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <section className="product__section product__categories--section section--padding">
+        <div className="container">
+          <div className="section__heading text-center mb-40">
+            <span className="section__heading--subtitle">Recently added our store</span>
+            <h2 className="section__heading--maintitle">Our Hottest Categories</h2>
+          </div>
+          <div className="text-center">Loading categories...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="product__section product__categories--section section--padding">
+        <div className="container">
+          <div className="section__heading text-center mb-40">
+            <span className="section__heading--subtitle">Recently added our store</span>
+            <h2 className="section__heading--maintitle">Our Hottest Categories</h2>
+          </div>
+          <div className="text-center text-danger">Error loading categories: {error}</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (mappedCategories.length === 0) {
+    return (
+      <section className="product__section product__categories--section section--padding">
+        <div className="container">
+          <div className="section__heading text-center mb-40">
+            <span className="section__heading--subtitle">Recently added our store</span>
+            <h2 className="section__heading--maintitle">Our Hottest Categories</h2>
+          </div>
+          <div className="text-center">No categories available at the moment.</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="product__section product__categories--section section--padding">
@@ -25,7 +86,7 @@ const ProductCategories = () => {
           <Swiper
             modules={[Navigation]}
             spaceBetween={30}
-            loop={true}
+            loop={mappedCategories.length >= 5}
             navigation={{
               nextEl: '.swiper-button-next',
               prevEl: '.swiper-button-prev',
@@ -48,20 +109,20 @@ const ProductCategories = () => {
             }}
             className="swiper-wrapper"
           >
-            {categories.map((category) => (
+            {mappedCategories.map((category) => (
               <SwiperSlide key={category.id}>
                 <div className="product__items product__bg">
                   <div className="product__items--thumbnail">
-                    <Link className="product__items--link" to="/shop">
+                    <Link className="product__items--link" to={`/shop?category=${category.id}&catName=${encodeURIComponent(category.name)}`}>
                       <img 
                         className="product__items--img" 
-                        src={`/assets/img/product/${category.image}`} 
+                        src={`${API_CONFIG.IMAGE_URL}${category.image}`} 
                         alt="categories-img" 
                       />
                       <div className="product__categories--content d-flex justify-content-between align-items-center">
                         <div className="product__categories--content__left">
                           <h3 className="product__categories--content__maintitle">{category.name}</h3>
-                          <span className="product__categories--content__subtitle">{category.items} items</span>
+                          <span className="product__categories--content__subtitle">{category.items} subcategories</span>
                         </div>
                         <div className="product__categories--icon">
                           <span className="product__categories--icon__link">

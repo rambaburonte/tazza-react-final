@@ -1,83 +1,51 @@
 import React, { useState } from 'react';
 import ProductCard from './ProductCard';
+import { useHome } from '../context/HomeContext';
+import { API_CONFIG } from '../config/apiConfig';
 
 const TrendingProducts = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const { homeData, loading, error } = useHome();
 
-  const products = [
-    {
-      id: 1,
-      name: 'Vegetable-healthy',
-      price: 39.00,
-      oldPrice: 59.00,
-      images: ['product1.png', 'product2.png'],
-      badge: 'Sale',
-      category: ['all', 'fresh', 'nature']
-    },
-    {
-      id: 2,
-      name: 'Fresh-whole-fish',
-      price: 42.00,
-      oldPrice: 48.00,
-      images: ['product3.png', 'product4.png'],
-      badge: 'Sale',
-      category: ['all', 'fresh', 'fruits']
-    },
-    {
-      id: 3,
-      name: 'Chili-pepper',
-      price: 38.00,
-      oldPrice: 44.00,
-      images: ['product5.png', 'product6.png'],
-      badge: 'Sale',
-      category: ['all', 'nature', 'vegetable']
-    },
-    {
-      id: 4,
-      name: 'Green-surface',
-      price: 38.00,
-      oldPrice: 40.00,
-      images: ['product7.png', 'product8.png'],
-      badge: 'Sale',
-      category: ['all', 'recipies', 'vegetable']
-    },
-    {
-      id: 5,
-      name: 'Red-tomato-isolated',
-      price: 52.00,
-      oldPrice: 62.00,
-      images: ['product2.png', 'product1.png'],
-      badge: 'Sale',
-      category: ['all', 'fresh', 'fruits']
-    },
-    {
-      id: 6,
-      name: 'Raw-onions-surface',
-      price: 58.00,
-      oldPrice: 68.00,
-      images: ['product4.png', 'product3.png'],
-      badge: 'Sale',
-      category: ['all', 'vegetable', 'nature']
-    },
-    {
-      id: 7,
-      name: 'Chili-pepper',
-      price: 52.00,
-      oldPrice: 62.00,
-      images: ['product6.png', 'product5.png'],
-      badge: 'Sale',
-      category: ['all', 'recipies', 'fruits']
-    },
-    {
-      id: 8,
-      name: 'Papaya-green',
-      price: 48.00,
-      oldPrice: 54.00,
-      images: ['product8.png', 'product7.png'],
-      badge: 'Sale',
-      category: ['all', 'fresh', 'nature']
+  const products = homeData?.topProducts?.map(product => {
+    let imagesArr = [];
+    if (Array.isArray(product.images)) {
+      imagesArr = product.images;
+    } else if (typeof product.images === 'string') {
+      try {
+        imagesArr = JSON.parse(product.images);
+        if (!Array.isArray(imagesArr)) imagesArr = [];
+      } catch {
+        imagesArr = [];
+      }
     }
-  ];
+    
+    // Filter out empty/null images and add API_CONFIG.IMAGE_URL prefix
+    let validImages = imagesArr.filter(img => img && img.trim() !== '').map(img => {
+      return img.startsWith('http') ? img : API_CONFIG.IMAGE_URL + img;
+    });
+    
+    // Add cover image as the first image if it exists and valid images array is empty
+    if (product.cover && product.cover.trim() !== '' && validImages.length === 0) {
+      const coverUrl = product.cover.startsWith('http') ? product.cover : API_CONFIG.IMAGE_URL + product.cover;
+      validImages.unshift(coverUrl);
+    }
+    
+    // If still no images, use default
+    if (validImages.length === 0) {
+      validImages = ['/assets/img/product/default.png'];
+    }
+    
+    return {
+      id: product.id,
+      name: product.name,
+      price: typeof product.sell_price === 'number' ? product.sell_price : (typeof product.price === 'number' ? product.price : 0),
+      oldPrice: typeof product.original_price === 'number' ? product.original_price : (typeof product.old_price === 'number' ? product.old_price : undefined),
+      images: validImages,
+      badge: (typeof product.original_price === 'number' && typeof product.sell_price === 'number' && product.original_price > product.sell_price) ? 'Sale' : null,
+      category: product.category ? (Array.isArray(product.category) ? product.category : [product.category]) : ['all']
+    };
+  }) || [];
 
   const filteredProducts = products.filter(product => 
     activeTab === 'all' || product.category.includes(activeTab)

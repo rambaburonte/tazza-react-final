@@ -1,5 +1,4 @@
 import React from 'react';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
@@ -8,7 +7,6 @@ import Footer from '../components/Footer';
 const MyAccountPage = () => {
   return (
     <>
-      <Preloader />
       <Header />
 
       <main className="main__content_wrapper">

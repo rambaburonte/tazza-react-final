@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
@@ -48,7 +47,6 @@ const CheckoutPage = () => {
 
   return (
     <>
-      <Preloader />
       <Header />
 
       <main className="main__content_wrapper">
@@ -600,6 +598,34 @@ const CheckoutPage = () => {
             </div>
           </div>
         </section>
+
+        {/* Start brand logo section */}
+        <div className="brand__logo--section section--padding pt-0">
+          <div className="container-fluid">
+            <div className="row row-cols-1">
+              <div className="col">
+                <div className="brand__logo--section__inner d-flex justify-content-between align-items-center">
+                  <div className="brand__logo--items">
+                    <img className="brand__logo--items__thumbnail--img display-block" src="/assets/img/logo/brand-logo1.png" alt="brand img" />
+                  </div>
+                  <div className="brand__logo--items">
+                    <img className="brand__logo--items__thumbnail--img display-block" src="/assets/img/logo/brand-logo2.png" alt="brand img" />
+                  </div>
+                  <div className="brand__logo--items">
+                    <img className="brand__logo--items__thumbnail--img display-block" src="/assets/img/logo/brand-logo3.png" alt="brand img" />
+                  </div>
+                  <div className="brand__logo--items">
+                    <img className="brand__logo--items__thumbnail--img display-block" src="/assets/img/logo/brand-logo4.png" alt="brand img" />
+                  </div>
+                  <div className="brand__logo--items">
+                    <img className="brand__logo--items__thumbnail--img display-block" src="/assets/img/logo/brand-logo5.png" alt="brand img" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* End brand logo section */}
 
         <ShippingInfo />
       </main>

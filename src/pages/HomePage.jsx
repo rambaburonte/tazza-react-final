@@ -1,5 +1,4 @@
 import React from 'react';
-import Preloader from '../components/Preloader';
 import Header from '../components/Header';
 import HeroSlider from '../components/HeroSlider';
 import ProductCategories from '../components/ProductCategories';
@@ -14,7 +13,6 @@ import Footer from '../components/Footer';
 const HomePage = () => {
   return (
     <>
-      <Preloader />
       <Header />
       
       <main className="main__content_wrapper">

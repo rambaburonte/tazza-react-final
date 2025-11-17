@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { API_CONFIG, API_ENDPOINTS } from '../config/apiConfig';
+import { useCategories } from '../context/CategoriesContext';
 import CountdownTimer from './CountdownTimer';
 import MiniCart from './MiniCart';
 import SearchBox from './SearchBox';
@@ -10,6 +12,13 @@ const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+  const debounceTimer = useRef(null);
+  const { categories, loading: loadingCategories, error } = useCategories();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +51,83 @@ const Header = () => {
 
   const toggleCategories = () => {
     setIsCategoriesOpen(!isCategoriesOpen);
+  };
+
+  const performSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+    setSearchLoading(true);
+    setSearchError(null);
+    try {
+      const data = new URLSearchParams({
+        param: query,
+        stores: '2'
+      });
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.PRODUCTS.SEARCH_QUERY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        credentials: 'omit',
+        mode: 'cors',
+        body: data.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setSearchResults(result.data || []);
+    } catch (err) {
+      console.error('Search error:', err);
+      setSearchError('Search failed. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 500);
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [searchQuery]);
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim()) {
+      setSearchLoading(true);
+    } else {
+      setSearchLoading(false);
+      setSearchResults([]);
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const q = (searchQuery || '').trim();
+    if (!q) {
+      // If empty, just go to shop without query
+      navigate('/shop');
+      return;
+    }
+    // Redirect to shop with query param so ShopPage can pick it up
+    navigate(`/shop?q=${encodeURIComponent(q)}`);
   };
 
   return (
@@ -84,21 +170,45 @@ const Header = () => {
               </div>
 
               <div className="header__search--widget d-none d-lg-block header__sticky--none">
-                <form className="d-flex header__search--form" action="#">
+                <form className="d-flex header__search--form" onSubmit={handleSearchSubmit}>
                   <div className="header__select--categories select">
                     <select className="header__select--inner">
-                      <option value="1">Select Categories</option>
-                      <option value="2">Accessories</option>
-                      <option value="3">Accessories & More</option>
-                      <option value="4">Camera & Video</option>
-                      <option value="5">Butters & Eggs</option>
+                      <option value="">All Categories</option>
+                      {categories && categories.length > 0 && categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
                     </select>
                   </div>
-                  <div className="header__search--box">
+                  <div className="header__search--box" style={{ position: 'relative' }}>
                     <label>
-                      <input className="header__search--input" placeholder="Search Product" type="text" />
+                      <input className="header__search--input" placeholder="Search Products" type="text" value={searchQuery} onChange={handleSearchInputChange} />
                     </label>
                     <button className="header__search--button bg__secondary text-white" type="submit">Search</button>
+                    {(searchLoading || searchError || searchResults.length > 0) && (
+                      <div className="header__search--results" style={{ position: 'absolute', top: '100%', left: 0, width: '100%', maxWidth: '338px', background: 'white', border: '1px solid #ccc', zIndex: 1000, maxHeight: '300px', overflowY: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', borderRadius: '4px' }}>
+                        {searchLoading && <div style={{ padding: '8px 12px', fontSize: '14px' }}>Loading...</div>}
+                        {searchError && <div style={{ padding: '8px 12px', color: 'red', fontSize: '14px' }}>{searchError}</div>}
+                            {searchResults.length > 0 ? (
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                {searchResults.map(product => (
+                                  <li key={product.id} style={{ marginBottom: 8, cursor: 'pointer' }} onClick={() => { setSearchQuery(''); setSearchResults([]); navigate(`/product/${product.id}`); }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                      {product.cover && (
+                                        <img src={API_CONFIG.IMAGE_URL + product.cover} alt={product.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />
+                                      )}
+                                      <span>{product.name}</span>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              // Show no results when search completed and none found
+                              !searchLoading && searchQuery.trim() !== '' && (
+                                <div style={{ padding: '12px', color: '#666' }}>No results found</div>
+                              )
+                            )}
+                      </div>
+                    )}
                   </div>
                 </form>
               </div>
@@ -191,7 +301,125 @@ const Header = () => {
                   </svg>
                 </div>
                 <div className={`dropdown__categories--menu ${isCategoriesOpen ? 'active' : ''}`}>
-                  {/* Categories content would go here */}
+                  <ul className="d-none d-lg-block">
+                    {loadingCategories ? (
+                      <li className="categories__menu--items">
+                        <span className="categories__menu--link">Loading categories...</span>
+                      </li>
+                    ) : categories.length === 0 ? (
+                      <li className="categories__menu--items">
+                        <span className="categories__menu--link">No categories available</span>
+                      </li>
+                    ) : (
+                      categories.map(cat => (
+                        <li key={cat.id} className="categories__menu--items">
+                          <Link className="categories__menu--link" to="#">
+                            <svg className="categories__menu--svgicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                              <ellipse cx="256" cy="256" rx="267.57" ry="173.44" transform="rotate(-45 256 256.002)" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
+                              <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M334.04 177.96L177.96 334.04M278.3 278.3l-44.6-44.6M322.89 233.7l-44.59-44.59M456.68 211.4L300.6 55.32M211.4 456.68L55.32 300.6M233.7 322.89l-44.59-44.59"/>
+                            </svg> {cat.name}
+                            {cat.subCates && cat.subCates.length > 0 && (
+                              <svg className="categories__menu--right__arrow--icon" xmlns="http://www.w3.org/2000/svg" width="17.007" height="16.831" viewBox="0 0 512 512">
+                                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="48" d="M184 112l144 144-144 144"/>
+                              </svg>
+                            )}
+                          </Link>
+                          {cat.subCates && cat.subCates.length > 0 && (
+                            <ul
+                              className="categories__submenu border-radius-10"
+                              style={{
+                                minWidth: '180px',
+                                maxWidth: '240px',
+                                background: 'transparent',
+                                border: 'none',
+                                boxShadow: 'none',
+                                padding: 0,
+                                margin: 0,
+                              }}
+                            >
+                              {cat.subCates.map(sub => (
+                                <li
+                                  key={sub.id}
+                                  className="categories__menu--items"
+                                  style={{
+                                    margin: 0,
+                                    padding: 0,
+                                    listStyle: 'none',
+                                  }}
+                                >
+                                  <Link
+                                    className="categories__menu--link"
+                                    to="#"
+                                    style={{
+                                      display: 'block',
+                                      width: '100%',
+                                      padding: '10px 18px',
+                                      textAlign: 'left',
+                                      background: '#fff',
+                                      border: 'none',
+                                      borderRadius: 0,
+                                      color: '#222',
+                                      fontWeight: 500,
+                                      fontSize: '15px',
+                                      textDecoration: 'none',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      transition: 'background 0.18s, color 0.18s',
+                                    }}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.background = '#f2f2f2';
+                                      e.currentTarget.style.color = '#007bff';
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.background = '#fff';
+                                      e.currentTarget.style.color = '#222';
+                                    }}
+                                  >
+                                    {sub.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                  <nav className="category__mobile--menu">
+                    <ul className="category__mobile--menu_ul">
+                      {loadingCategories ? (
+                        <li className="categories__menu--items">
+                          <span className="categories__menu--link">Loading categories...</span>
+                        </li>
+                      ) : categories.length === 0 ? (
+                        <li className="categories__menu--items">
+                          <span className="categories__menu--link">No categories available</span>
+                        </li>
+                      ) : (
+                        categories.map(cat => (
+                          <li key={cat.id} className="categories__menu--items">
+                            <Link className="categories__menu--link" to="#">
+                              <svg className="categories__menu--svgicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <ellipse cx="256" cy="256" rx="267.57" ry="173.44" transform="rotate(-45 256 256.002)" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
+                                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M334.04 177.96L177.96 334.04M278.3 278.3l-44.6-44.6M322.89 233.7l-44.59-44.59M456.68 211.4L300.6 55.32M211.4 456.68L55.32 300.6M233.7 322.89l-44.59-44.59"/>
+                              </svg> {cat.name}
+                            </Link>
+                            {cat.subCates && cat.subCates.length > 0 && (
+                              <ul className="category__sub--menu">
+                                {cat.subCates.map(sub => (
+                                  <li key={sub.id} className="categories__submenu--items">
+                                    <Link className="categories__submenu--items__text" to="#">{sub.name}</Link>
+                                    {/* For simplicity, not adding deeper submenus */}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </nav>
                 </div>
               </div>
 

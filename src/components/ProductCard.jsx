@@ -1,34 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { API_CONFIG } from '../config/apiConfig';
 
 const ProductCard = ({ product }) => {
+  // Handle API product structure and normalize prices
+  const price = parseFloat(product.sell_price ?? product.price ?? 0) || 0;
+  // Determine an old/original price to show as strike-through (prefer explicit original_price / oldPrice)
+  const candidateOriginal = parseFloat(product.original_price ?? product.oldPrice ?? product.old_price ?? 0) || 0;
+  const oldPrice = candidateOriginal > price ? candidateOriginal : (parseFloat(product.price || 0) > price ? parseFloat(product.price) : undefined);
+  // compute discount percent if not provided by API
+  const discountPercent = (typeof product.discount !== 'undefined' && product.discount !== null && product.discount !== '' && !isNaN(Number(product.discount)))
+    ? Math.round(Number(product.discount))
+    : (oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0);
+  
+  // Parse images array from API response (it's a JSON string or array)
+  let parsedImages = [];
+  try {
+    if (product.images && typeof product.images === 'string') {
+      parsedImages = JSON.parse(product.images).filter(img => img && img.trim() !== '');
+    } else if (Array.isArray(product.images)) {
+      parsedImages = product.images.filter(img => img && img.trim() !== '');
+    }
+  } catch (e) {
+    console.warn('Failed to parse product images:', e);
+  }
+  
+  // Process images - if they already have full URLs, use as is, otherwise add API_CONFIG.IMAGE_URL
+  const processedImages = parsedImages.map(img => {
+    return img.startsWith('http') ? img : `${API_CONFIG.IMAGE_URL}${img}`;
+  });
+  
+  // If no valid images, try to use cover image
+  const images = processedImages.length > 0 
+    ? processedImages
+    : [product.cover ? (product.cover.startsWith('http') ? product.cover : `${API_CONFIG.IMAGE_URL}${product.cover}`) : '/assets/img/product/default.png'];
+  
   const [currentImage, setCurrentImage] = useState(0);
+  const intervalRef = useRef(null);
+
+  const startImageCarousel = () => {
+    if (images.length <= 1) return;
+    let idx = 0;
+    intervalRef.current = setInterval(() => {
+      idx = (idx + 1) % images.length;
+      setCurrentImage(idx);
+    }, 700); // Change image every 700ms
+  };
+
+  const stopImageCarousel = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setCurrentImage(0);
+  };
 
   return (
     <div className="product__items">
+      <style>
+        {`
+          .product__items--action {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+          }
+          .product__items:hover .product__items--action {
+            display: block;
+          }
+        `}
+      </style>
       <div className="product__items--thumbnail">
         <Link 
           className="product__items--link" 
           to={`/product/${product.id}`}
-          onMouseEnter={() => setCurrentImage(1)}
-          onMouseLeave={() => setCurrentImage(0)}
+          onMouseEnter={startImageCarousel}
+          onMouseLeave={stopImageCarousel}
         >
           <img 
             className="product__items--img product__primary--img" 
-            src={`/assets/img/product/${product.images[0]}`} 
+            src={images[currentImage]} 
             alt="product-img" 
-            style={{ display: currentImage === 0 ? 'block' : 'none' }}
-          />
-          <img 
-            className="product__items--img product__secondary--img" 
-            src={`/assets/img/product/${product.images[1]}`} 
-            alt="product-img"
-            style={{ display: currentImage === 1 ? 'block' : 'none' }}
+            style={{ display: 'block' }}
+            onError={(e) => {
+              e.target.src = '/assets/img/product/default.png';
+            }}
           />
         </Link>
-        {product.badge && (
+        {(discountPercent > 0) && (
           <div className="product__badge">
-            <span className="product__badge--items sale">{product.badge}</span>
+            <span className="product__badge--items sale">{discountPercent}% OFF</span>
           </div>
         )}
         <ul className="product__items--action">
@@ -40,24 +102,6 @@ const ProductCard = ({ product }) => {
               <span className="visually-hidden">Wishlist</span>
             </button>
           </li>
-          <li className="product__items--action__list">
-            <button className="product__items--action__btn" aria-label="Quick View">
-              <svg className="product__items--action__btn--svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="32"/>
-                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="32" d="M338.29 338.29L448 448"/>
-              </svg>
-              <span className="visually-hidden">Quick View</span>
-            </button>
-          </li>
-          <li className="product__items--action__list">
-            <button className="product__items--action__btn" aria-label="Compare">
-              <svg className="product__items--action__btn--svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M400 304l48 48-48 48M400 112l48 48-48 48M64 352h85.19a80 80 0 0066.56-35.62L256 256"/>
-                <path d="M64 160h85.19a80 80 0 0166.56 35.62l80.5 120.76A80 80 0 00362.81 352H416M416 160h-53.19a80 80 0 00-66.56 35.62L288 208" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
-              </svg>
-              <span className="visually-hidden">Compare</span>
-            </button>
-          </li>
         </ul>
       </div>
       <div className="product__items--content text-center">
@@ -66,8 +110,16 @@ const ProductCard = ({ product }) => {
           <Link to={`/product/${product.id}`}>{product.name}</Link>
         </h3>
         <div className="product__items--price">
-          <span className="current__price">${product.price.toFixed(2)}</span>
-          <span className="old__price">${product.oldPrice.toFixed(2)}</span>
+          <span className="current__price">${price.toFixed(2)}</span>
+          {(typeof oldPrice === 'number' && oldPrice > price) && (
+            <span className="old__price">${oldPrice.toFixed(2)}</span>
+          )}
+          {/* keep showing explicit original_price if present for clarity */}
+          {product.original_price && (!oldPrice || Number(product.original_price) !== oldPrice) && (
+            <span className="original__price" style={{ display: 'block', color: '#888', fontSize: '13px', textDecoration: 'line-through' }}>
+              ${parseFloat(product.original_price).toFixed(2)}
+            </span>
+          )}
         </div>
       </div>
     </div>
