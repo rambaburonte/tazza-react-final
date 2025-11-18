@@ -290,7 +290,7 @@ const AboutPage = () => {
         <TestimonialSection />
 
         {/* Start brand logo section */}
-        <div className="brand__logo--section section--padding">
+        {/* <div className="brand__logo--section section--padding">
           <div className="container">
             <div className="row row-cols-1">
               <div className="col">
@@ -314,10 +314,10 @@ const AboutPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* End brand logo section */}
 
-        <ShippingInfo />
+        {/* <ShippingInfo /> removed as per request */}
       </main>
 
       <Footer />

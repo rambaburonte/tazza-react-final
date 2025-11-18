@@ -7,6 +7,7 @@ import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
@@ -19,6 +20,7 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const productId = id;
   const cart = useCart();
+  const wishlist = useWishlist();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -201,6 +203,19 @@ const ProductDetailPage = () => {
                     >
                       Add to Cart
                     </button>
+                    <button
+                      className="pd-buy"
+                      style={{ background: wishlist.isInWishlist(product?.id) ? '#e63946' : '#fff', color: wishlist.isInWishlist(product?.id) ? '#fff' : '#0b63d6', border: '1px solid #e63946' }}
+                      onClick={() => {
+                        if (wishlist.isInWishlist(product?.id)) {
+                          wishlist.removeFromWishlist(product?.id);
+                        } else {
+                          wishlist.addToWishlist(product);
+                        }
+                      }}
+                    >
+                      {wishlist.isInWishlist(product?.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                    </button>
                   </div>
 
                   <div className="pd-section">
@@ -230,7 +245,7 @@ const ProductDetailPage = () => {
             ) : null}
           </div>
         </section>
-        <ShippingInfo />
+        {/* <ShippingInfo /> removed as per request */}
       </main>
       <Footer />
     </>

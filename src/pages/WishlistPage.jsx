@@ -1,49 +1,17 @@
 import React from 'react';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
 import Footer from '../components/Footer';
+import { API_CONFIG } from '../config/apiConfig';
 
 const WishlistPage = () => {
-  const wishlistItems = [
-    {
-      id: 1,
-      name: 'Fresh-whole-fish',
-      price: 65.00,
-      stock: 'in stock',
-      image: 'product1.png',
-      color: 'Blue',
-      weight: '2 Kg'
-    },
-    {
-      id: 2,
-      name: 'Vegetable-healthy',
-      price: 65.00,
-      stock: 'in stock',
-      image: 'product2.png',
-      color: 'Blue',
-      weight: '2 Kg'
-    },
-    {
-      id: 3,
-      name: 'Raw-onions-surface',
-      price: 65.00,
-      stock: 'in stock',
-      image: 'product3.png',
-      color: 'Blue',
-      weight: '2 Kg'
-    },
-    {
-      id: 4,
-      name: 'Red-tomato-isolated',
-      price: 65.00,
-      stock: 'in stock',
-      image: 'product4.png',
-      color: 'Blue',
-      weight: '2 Kg'
-    }
-  ];
+  const wishlist = useWishlist();
+  const cart = useCart();
+  const wishlistItems = wishlist.wishlist;
 
   const newProducts = [
     {
@@ -127,40 +95,43 @@ const WishlistPage = () => {
                       </tr>
                     </thead>
                     <tbody className="cart__table--body">
-                      {wishlistItems.map((item) => (
-                        <tr key={item.id} className="cart__table--body__items">
-                          <td className="cart__table--body__list">
-                            <div className="cart__product d-flex align-items-center">
-                              <button className="cart__remove--btn" aria-label="search button" type="button">
-                                <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16px" height="16px">
-                                  <path d="M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z"/>
-                                </svg>
-                              </button>
-                              <div className="cart__thumbnail">
-                                <Link to="/product-detail">
-                                  <img className="border-radius-5" src={`/assets/img/product/${item.image}`} alt="cart-product" />
-                                </Link>
+                      {wishlistItems.length === 0 ? (
+                        <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px' }}>Your wishlist is empty.</td></tr>
+                      ) : (
+                        wishlistItems.map((item) => (
+                          <tr key={item.id} className="cart__table--body__items">
+                            <td className="cart__table--body__list">
+                              <div className="cart__product d-flex align-items-center">
+                                <button className="cart__remove--btn" aria-label="Remove from wishlist" type="button" onClick={() => wishlist.removeFromWishlist(item.id)}>
+                                  <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16px" height="16px">
+                                    <path d="M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z"/>
+                                  </svg>
+                                </button>
+                                <div className="cart__thumbnail">
+                                  <Link to={`/product/${item.id}`}>
+                                    <img className="border-radius-5" src={item.cover ? (item.cover.startsWith('http') ? item.cover : `${API_CONFIG.IMAGE_URL}${item.cover}`) : '/assets/img/product/default.png'} alt="cart-product" />
+                                  </Link>
+                                </div>
+                                <div className="cart__content">
+                                  <h3 className="cart__content--title h4">
+                                    <Link to={`/product/${item.id}`}>{item.name}</Link>
+                                  </h3>
+                                  {/* Optionally show more product info here */}
+                                </div>
                               </div>
-                              <div className="cart__content">
-                                <h3 className="cart__content--title h4">
-                                  <Link to="/product-detail">{item.name}</Link>
-                                </h3>
-                                <span className="cart__content--variant">COLOR: {item.color}</span>
-                                <span className="cart__content--variant">WEIGHT: {item.weight}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="cart__table--body__list">
-                            <span className="cart__price">£{item.price.toFixed(2)}</span>
-                          </td>
-                          <td className="cart__table--body__list text-center">
-                            <span className="in__stock text__secondary">{item.stock}</span>
-                          </td>
-                          <td className="cart__table--body__list text-right">
-                            <Link className="wishlist__cart--btn btn" to="/cart">Add To Cart</Link>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="cart__table--body__list">
+                              <span className="cart__price">${(item.price || item.sell_price || 0).toFixed(2)}</span>
+                            </td>
+                            <td className="cart__table--body__list text-center">
+                              <span className="in__stock text__secondary">In stock</span>
+                            </td>
+                            <td className="cart__table--body__list text-right">
+                              <button className="wishlist__cart--btn btn" onClick={() => cart.addToCart(item)}>Add To Cart</button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                   <div className="continue__shopping d-flex justify-content-between">
@@ -254,7 +225,7 @@ const WishlistPage = () => {
           </div>
         </section>
 
-        <div className="brand__logo--section section--padding pt-0">
+        {/* <div className="brand__logo--section section--padding pt-0">
           <div className="container">
             <div className="row row-cols-1">
               <div className="col">
@@ -268,7 +239,7 @@ const WishlistPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <ShippingInfo />
       </main>

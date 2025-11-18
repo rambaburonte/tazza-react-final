@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_CONFIG, API_ENDPOINTS } from '../config/apiConfig';
 import { useCategories } from '../context/CategoriesContext';
@@ -8,6 +10,8 @@ import SearchBox from './SearchBox';
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
+  const wishlist = useWishlist();
+  const cart = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -20,41 +24,13 @@ const Header = () => {
   const { categories, loading: loadingCategories, error } = useCategories();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const headerHeight = document.querySelector('header')?.clientHeight || 0;
-      if (window.scrollY > headerHeight) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    document.body.classList.toggle('mobile_menu_open');
-  };
-
-  const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
-    document.body.classList.toggle('offCanvas__minicart_active');
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    document.body.classList.toggle('predictive__search--box_active');
-  };
-
-  const toggleCategories = () => {
-    setIsCategoriesOpen(!isCategoriesOpen);
-  };
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
+  const toggleCart = () => setIsCartOpen(!isCartOpen);
+  const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
 
   const performSearch = async (query) => {
-    if (!query.trim()) {
+    if (!query || !query.trim()) {
       setSearchResults([]);
       setSearchLoading(false);
       return;
@@ -62,10 +38,7 @@ const Header = () => {
     setSearchLoading(true);
     setSearchError(null);
     try {
-      const data = new URLSearchParams({
-        param: query,
-        stores: '2'
-      });
+      const data = new URLSearchParams({ param: query, stores: '2' });
       const response = await fetch(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.PRODUCTS.SEARCH_QUERY}`, {
         method: 'POST',
         headers: {
@@ -139,11 +112,11 @@ const Header = () => {
             <div className="header__topbar--inner d-flex align-items-center justify-content-center">
               <div className="header__shipping">
                 <p className="header__shipping--text text-white">
-                  <img className="header__shipping--icon" src={'/assets/img/icon/car.png'} alt="header-shipping-img" />
-                  Claim your online FREE Delivery or Shipping today! Expires in
+                  {/* <img className="header__shipping--icon" src={'/assets/img/icon/car.png'} alt="header-shipping-img" /> */}
+                  We proudly serve customers across the United States.
                 </p>
               </div>
-              <CountdownTimer targetDate="Dec 30, 2025 00:00:00" />
+              {/* <CountdownTimer targetDate="Dec 30, 2025 00:00:00" /> */}
             </div>
           </div>
         </div>
@@ -269,7 +242,7 @@ const Header = () => {
                           </g>
                         </g>
                       </svg>
-                      <span className="items__count">3</span>
+                      <span className="items__count">{cart && typeof cart.getTotalItems === 'function' ? cart.getTotalItems() : 0}</span>
                     </button>
                   </li>
                   <li className="header__account--items d-none d-lg-block">
@@ -277,7 +250,7 @@ const Header = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="18.541" height="15.557" viewBox="0 0 18.541 15.557">
                         <path d="M71.775,135.51a5.153,5.153,0,0,1,1.267-1.524,4.986,4.986,0,0,1,6.584.358,4.728,4.728,0,0,1,1.174,4.914,10.458,10.458,0,0,1-2.132,3.808,22.591,22.591,0,0,1-5.4,4.558c-.445.282-.9.549-1.356.812a.306.306,0,0,1-.254.013,25.491,25.491,0,0,1-6.279-4.8,11.648,11.648,0,0,1-2.52-4.009,4.957,4.957,0,0,1,.028-3.787,4.629,4.629,0,0,1,3.744-2.863,4.782,4.782,0,0,1,5.086,2.447c.013.019.025.034.057.076Z" transform="translate(-62.498 -132.915)" fill="currentColor"/>
                       </svg>
-                      <span className="items__count">3</span>
+                      <span className="items__count">{wishlist.getTotalWishlistItems()}</span>
                     </Link>
                   </li>
                 </ul>
@@ -298,7 +271,7 @@ const Header = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" width="18.541" height="15.557" viewBox="0 0 18.541 15.557">
                         <path d="M71.775,135.51a5.153,5.153,0,0,1,1.267-1.524,4.986,4.986,0,0,1,6.584.358,4.728,4.728,0,0,1,1.174,4.914,10.458,10.458,0,0,1-2.132,3.808,22.591,22.591,0,0,1-5.4,4.558c-.445.282-.9.549-1.356.812a.306.306,0,0,1-.254.013,25.491,25.491,0,0,1-6.279-4.8,11.648,11.648,0,0,1-2.52-4.009,4.957,4.957,0,0,1,.028-3.787,4.629,4.629,0,0,1,3.744-2.863,4.782,4.782,0,0,1,5.086,2.447c.013.019.025.034.057.076Z" transform="translate(-62.498 -132.915)" fill="currentColor"/>
                       </svg>
-                      <span className="items__count">3</span>
+                      <span className="items__count">{wishlist.getTotalWishlistItems()}</span>
                     </Link>
                   </li>
                   <li className="header__account--items d-none d-lg-block">
@@ -321,7 +294,7 @@ const Header = () => {
                           </g>
                         </g>
                       </svg>
-                      <span className="items__count">3</span>
+                      <span className="items__count">{cart && typeof cart.getTotalItems === 'function' ? cart.getTotalItems() : 0}</span>
                     </button>
                   </li>
                 </ul>
@@ -357,7 +330,15 @@ const Header = () => {
                     ) : (
                       categories.map(cat => (
                         <li key={cat.id} className="categories__menu--items">
-                          <Link className="categories__menu--link" to="#">
+                          <a
+                            href="#"
+                            className="categories__menu--link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigate('/shop', { state: { categoryId: cat.id, categoryName: cat.name } });
+                              setIsCategoriesOpen(false);
+                            }}
+                          >
                             <svg className="categories__menu--svgicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                               <ellipse cx="256" cy="256" rx="267.57" ry="173.44" transform="rotate(-45 256 256.002)" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
                               <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M334.04 177.96L177.96 334.04M278.3 278.3l-44.6-44.6M322.89 233.7l-44.59-44.59M456.68 211.4L300.6 55.32M211.4 456.68L55.32 300.6M233.7 322.89l-44.59-44.59"/>
@@ -367,7 +348,7 @@ const Header = () => {
                                 <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="48" d="M184 112l144 144-144 144"/>
                               </svg>
                             )}
-                          </Link>
+                          </a>
                           {cat.subCates && cat.subCates.length > 0 && (
                             <ul
                               className="categories__submenu border-radius-10"
@@ -391,9 +372,9 @@ const Header = () => {
                                     listStyle: 'none',
                                   }}
                                 >
-                                  <Link
+                                  <a
                                     className="categories__menu--link"
-                                    to="#"
+                                    href="#"
                                     style={{
                                       display: 'block',
                                       width: '100%',
@@ -419,9 +400,14 @@ const Header = () => {
                                       e.currentTarget.style.background = '#fff';
                                       e.currentTarget.style.color = '#222';
                                     }}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      navigate('/shop', { state: { categoryId: cat.id, categoryName: cat.name, subCategoryId: sub.id, subCategoryName: sub.name } });
+                                      setIsCategoriesOpen(false);
+                                    }}
                                   >
                                     {sub.name}
-                                  </Link>
+                                  </a>
                                 </li>
                               ))}
                             </ul>
@@ -443,17 +429,37 @@ const Header = () => {
                       ) : (
                         categories.map(cat => (
                           <li key={cat.id} className="categories__menu--items">
-                            <Link className="categories__menu--link" to="#">
+                            <a
+                              href="#"
+                              className="categories__menu--link"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate('/shop', { state: { categoryId: cat.id, categoryName: cat.name } });
+                                setIsCategoriesOpen(false);
+                                setIsMobileMenuOpen(false);
+                              }}
+                            >
                               <svg className="categories__menu--svgicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <ellipse cx="256" cy="256" rx="267.57" ry="173.44" transform="rotate(-45 256 256.002)" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32"/>
                                 <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="32" d="M334.04 177.96L177.96 334.04M278.3 278.3l-44.6-44.6M322.89 233.7l-44.59-44.59M456.68 211.4L300.6 55.32M211.4 456.68L55.32 300.6M233.7 322.89l-44.59-44.59"/>
                               </svg> {cat.name}
-                            </Link>
+                            </a>
                             {cat.subCates && cat.subCates.length > 0 && (
                               <ul className="category__sub--menu">
                                 {cat.subCates.map(sub => (
                                   <li key={sub.id} className="categories__submenu--items">
-                                    <Link className="categories__submenu--items__text" to="#">{sub.name}</Link>
+                                    <a
+                                      href="#"
+                                      className="categories__submenu--items__text"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        navigate('/shop', { state: { categoryId: cat.id, categoryName: cat.name, subCategoryId: sub.id, subCategoryName: sub.name } });
+                                        setIsCategoriesOpen(false);
+                                        setIsMobileMenuOpen(false);
+                                      }}
+                                    >
+                                      {sub.name}
+                                    </a>
                                     {/* For simplicity, not adding deeper submenus */}
                                   </li>
                                 ))}
@@ -498,7 +504,7 @@ const Header = () => {
                   </svg>
                   <p className="suport__contact--text text-white">
                     <span className="suport__text--24">24/7 Suport</span>
-                    <a className="suport__contact--number" href="tel:+1234567890">+1 234 567 890</a>
+                    <a className="suport__contact--number" href="tel:+1 248 497 9083">+1 248 497 9083</a>
                   </p>
                 </div>
               </div>

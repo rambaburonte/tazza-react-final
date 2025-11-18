@@ -600,7 +600,7 @@ const CheckoutPage = () => {
         </section>
 
         {/* Start brand logo section */}
-        <div className="brand__logo--section section--padding pt-0">
+        {/* <div className="brand__logo--section section--padding pt-0">
           <div className="container-fluid">
             <div className="row row-cols-1">
               <div className="col">
@@ -624,10 +624,10 @@ const CheckoutPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* End brand logo section */}
 
-        <ShippingInfo />
+        {/* <ShippingInfo /> removed as per request */}
       </main>
 
       <Footer />

@@ -8,32 +8,43 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
+import { useCart } from '../context/CartContext';
+import { API_CONFIG } from '../config/apiConfig';
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: 'Fresh Organic Tomatoes', price: 35.00, quantity: 1, image: 'product1.png' },
-    { id: 2, name: 'Fresh Green Cabbage', price: 42.00, quantity: 2, image: 'product2.png' },
-    { id: 3, name: 'Organic Beetroot', price: 28.00, quantity: 1, image: 'product3.png' },
-    { id: 4, name: 'Fresh Red Cabbage', price: 25.00, quantity: 1, image: 'product4.png' }
-  ]);
-
+  const cart = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [note, setNote] = useState('');
 
   const updateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item => item.id === id ? { ...item, quantity: newQuantity } : item)
-    );
+    cart.updateQuantity(id, newQuantity);
   };
 
   const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+    cart.removeItem(id);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = 10.00;
-  const total = subtotal + shipping;
+  const getItemImage = (item) => {
+    if (item.cover && typeof item.cover === 'string' && item.cover.trim()) {
+      return item.cover.startsWith('http') ? item.cover : `${API_CONFIG.IMAGE_URL}${item.cover}`;
+    }
+    return '/assets/img/product/default.png';
+  };
+
+  const getItemPrice = (item) => {
+    // Use the same pricing logic as cart context
+    const discount = parseFloat(item.discount) || 0;
+    if (discount > 0) {
+      return parseFloat(item.sell_price || item.price || '0');
+    } else {
+      return parseFloat(item.original_price || item.price || '0');
+    }
+  };
+
+  const getItemTotal = (item) => {
+    return (getItemPrice(item) * item.quantiy).toFixed(2);
+  };
 
   const newProducts = [
     { id: 1, name: 'Fresh Organic Tomatoes', price: 35.00, originalPrice: 40.00, image: 'product1.png', rating: 5 },
@@ -69,48 +80,58 @@ const CartPage = () => {
                             </tr>
                         </thead>
                         <tbody className="cart__table--body">
-                          {cartItems.map((item) => (
-                            <tr key={item.id} className="cart__table--body__items">
-                              <td className="cart__table--body__list">
-                                <div className="cart__product d-flex align-items-center">
-                                  <button
-                                    className="cart__remove--btn"
-                                    type="button"
-                                    onClick={() => removeItem(item.id)}
-                                  >
-                                    <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16px" height="16px">
-                                      <path d="M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z" />
-                                    </svg>
-                                  </button>
-                                  <div className="cart__thumbnail">
-                                    <img className="border-radius-5" src={`/assets/img/product/${item.image}`} alt={item.name} />
-                                  </div>
-                                  <div className="cart__content">
-                                    <h4 className="cart__content--title">
-                                      <Link to="/product-detail">{item.name}</Link>
-                                    </h4>
-                                    <span className="cart__content--variant">COLOR: Blue</span>
-                                    <span className="cart__content--variant">WEIGHT: 2 Kg</span>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="cart__table--body__list">
-                                <span className="cart__price">£{item.price.toFixed(2)}</span>
-                              </td>
-                              <td className="cart__table--body__list">
-                                <div className="quantity__box">
-                                  <button type="button" className="quantity__value quickview__value--quantity decrease" aria-label="quantity value" value="Decrease Value" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
-                                  <label>
-                                    <input type="number" className="quantity__number quickview__value--number" value={item.quantity} onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)} data-counter />
-                                  </label>
-                                  <button type="button" className="quantity__value quickview__value--quantity increase" aria-label="quantity value" value="Increase Value" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                                </div>
-                              </td>
-                              <td className="cart__table--body__list">
-                                <span className="cart__price end">£{(item.price * item.quantity).toFixed(2)}</span>
+                          {cart.cart.length === 0 ? (
+                            <tr>
+                              <td colSpan="4" className="text-center py-4">
+                                Your cart is empty
                               </td>
                             </tr>
-                          ))}
+                          ) : (
+                            cart.cart.map((item) => (
+                              <tr key={item.id} className="cart__table--body__items">
+                                <td className="cart__table--body__list">
+                                  <div className="cart__product d-flex align-items-center">
+                                    <button
+                                      className="cart__remove--btn"
+                                      type="button"
+                                      onClick={() => removeItem(item.id)}
+                                    >
+                                      <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16px" height="16px">
+                                        <path d="M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z" />
+                                      </svg>
+                                    </button>
+                                    <div className="cart__thumbnail">
+                                      <img className="border-radius-5" src={getItemImage(item)} alt={item.name} />
+                                    </div>
+                                    <div className="cart__content">
+                                      <h4 className="cart__content--title">
+                                        <Link to={`/product/${item.id}`}>{item.name}</Link>
+                                      </h4>
+                                      <span className="cart__content--variant">STORE: {item.store_name}</span>
+                                      {parseFloat(item.discount) > 0 && (
+                                        <span className="cart__content--variant">DISCOUNT: {item.discount}% OFF</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="cart__table--body__list">
+                                  <span className="cart__price">${getItemPrice(item).toFixed(2)}</span>
+                                </td>
+                                <td className="cart__table--body__list">
+                                  <div className="quantity__box">
+                                    <button type="button" className="quantity__value quickview__value--quantity decrease" aria-label="quantity value" value="Decrease Value" onClick={() => updateQuantity(item.id, item.quantiy - 1)}>-</button>
+                                    <label>
+                                      <input type="number" className="quantity__number quickview__value--number" value={item.quantiy} onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)} data-counter />
+                                    </label>
+                                    <button type="button" className="quantity__value quickview__value--quantity increase" aria-label="quantity value" value="Increase Value" onClick={() => updateQuantity(item.id, item.quantiy + 1)}>+</button>
+                                  </div>
+                                </td>
+                                <td className="cart__table--body__list">
+                                  <span className="cart__price end">${getItemTotal(item)}</span>
+                                </td>
+                              </tr>
+                            ))
+                          )}
                         </tbody>
                       </table>
                       <div className="continue__shopping d-flex justify-content-between">
@@ -141,11 +162,27 @@ const CartPage = () => {
                           <tbody>
                             <tr className="cart__summary--total__list">
                               <td className="cart__summary--total__title text-left">SUBTOTAL</td>
-                              <td className="cart__summary--amount text-right">${subtotal.toFixed(2)}</td>
+                              <td className="cart__summary--amount text-right">${cart.totalPrice.toFixed(2)}</td>
+                            </tr>
+                            {cart.discount > 0 && (
+                              <tr className="cart__summary--total__list">
+                                <td className="cart__summary--total__title text-left">DISCOUNT</td>
+                                <td className="cart__summary--amount text-right">-${cart.discount.toFixed(2)}</td>
+                              </tr>
+                            )}
+                            {cart.deliveryPrice > 0 && (
+                              <tr className="cart__summary--total__list">
+                                <td className="cart__summary--total__title text-left">DELIVERY</td>
+                                <td className="cart__summary--amount text-right">${cart.deliveryPrice.toFixed(2)}</td>
+                              </tr>
+                            )}
+                            <tr className="cart__summary--total__list">
+                              <td className="cart__summary--total__title text-left">TAX</td>
+                              <td className="cart__summary--amount text-right">${(cart.totalPrice * cart.orderTax / 100).toFixed(2)}</td>
                             </tr>
                             <tr className="cart__summary--total__list">
                               <td className="cart__summary--total__title text-left">GRAND TOTAL</td>
-                              <td className="cart__summary--amount text-right">${total.toFixed(2)}</td>
+                              <td className="cart__summary--amount text-right">${cart.grandTotal.toFixed(2)}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -260,7 +297,7 @@ const CartPage = () => {
             </div>
         </section>
 
-        <div className="brand__logo--section section--padding pt-0">
+        {/* <div className="brand__logo--section section--padding pt-0">
           <div className="container">
             <div className="row row-cols-1">
               <div className="col">
@@ -278,7 +315,7 @@ const CartPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <ShippingInfo />
       </main>

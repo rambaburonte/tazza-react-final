@@ -32,6 +32,26 @@ export const API_ENDPOINTS = {
   CITIES: {
     GET_ALL: 'cities/getAll',
   },
+  // Cart Management
+  CART: {
+    VALIDATE_COUPON: 'coupons/validate',
+    SYNC: 'cart/sync',
+  },
+  // Orders
+  ORDERS: {
+    CREATE: 'orders/create',
+    GET_BY_UID: 'orders/getByUid',
+  },
+  // Addresses
+  ADDRESS: {
+    GET_BY_UID: 'address/getByUid',
+    ADD_NEW: 'address/addNew',
+  },
+  // Utilities
+  UTILITIES: {
+    GET_SETTINGS: 'settings/getDefaultWeb',
+    GET_COUPONS: 'coupons/getAll',
+  },
 };
 
 export default API_CONFIG;

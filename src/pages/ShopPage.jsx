@@ -1134,7 +1134,7 @@ const ShopPage = () => {
           </div>
         </section>
 
-        <ShippingInfo />
+        {/* <ShippingInfo /> removed as per request */}
       </main>
 
       <Footer />

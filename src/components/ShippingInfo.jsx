@@ -13,7 +13,7 @@ const ShippingInfo = () => {
             </div>
             <div className="shipping__items--content text-center">
               <h2 className="shipping__items--title h3">Free Shipping</h2>
-              <p className="shipping__items--desc">On all orders over $75.00</p>
+              <p className="shipping__items--desc"></p>
             </div>
           </div>
           <div className="shipping__items">
@@ -24,7 +24,7 @@ const ShippingInfo = () => {
             </div>
             <div className="shipping__items--content text-center">
               <h2 className="shipping__items--title h3">Free Returns</h2>
-              <p className="shipping__items--desc">On all orders over $75.00</p>
+              <p className="shipping__items--desc"></p>
             </div>
           </div>
           <div className="shipping__items">
@@ -35,7 +35,7 @@ const ShippingInfo = () => {
             </div>
             <div className="shipping__items--content text-center">
               <h2 className="shipping__items--title h3">Secure Payment</h2>
-              <p className="shipping__items--desc">On all orders over $75.00</p>
+              <p className="shipping__items--desc"></p>
             </div>
           </div>
           <div className="shipping__items">
@@ -46,7 +46,7 @@ const ShippingInfo = () => {
             </div>
             <div className="shipping__items--content text-center">
               <h2 className="shipping__items--title h3">Gift Service</h2>
-              <p className="shipping__items--desc">On all orders over $75.00</p>
+              <p className="shipping__items--desc"></p>
             </div>
           </div>
         </div>

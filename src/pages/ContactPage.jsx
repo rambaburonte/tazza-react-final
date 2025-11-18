@@ -136,8 +136,8 @@ const ContactPage = () => {
                     </div>
                     <div className="contact__info--content">
                       <p className="contact__info--content__desc text-white">
-                        Change the design through a range <br />
-                        <a href="tel:+01234-567890">+01234-567890</a> <a href="tel:+01234-5688765">+01234-5688765</a>
+                        
+                        <a href="tel:+12484979083">+1 248 497 9083</a>
                       </p>
                     </div>
                   </div>
@@ -152,8 +152,8 @@ const ContactPage = () => {
                     </div>
                     <div className="contact__info--content">
                       <p className="contact__info--content__desc text-white">
-                        <a href="mailto:info@example.com">info@example.com</a> <br />
-                        <a href="mailto:info@example.com">info@example.com</a>
+                        <a href="mailto:contact@tazatropics.com">contact@tazatropics.com</a> <br />
+                        <a href="mailto:help@tazatropics.com">help@tazatropics.com</a>
                       </p>
                     </div>
                   </div>
@@ -168,7 +168,7 @@ const ContactPage = () => {
                     </div>
                     <div className="contact__info--content">
                       <p className="contact__info--content__desc text-white">
-                        123 Stree New York City, United States Of America NY 750065.
+                        1800, NW 160 th Street, Okeechobee, FL 34972
                       </p>
                     </div>
                   </div>
@@ -218,7 +218,7 @@ const ContactPage = () => {
         <div className="contact__map--area section--padding pt-0">
           <iframe
             className="contact__map--iframe"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7887.465355142307!2d-0.13384360843222626!3d51.4876034467734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48760532743b90e1%3A0x790260718555a20c!2sU.S.%20Embassy%2C%20London!5e0!3m2!1sen!2sbd!4v1632035375945!5m2!1sen!2sbd"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3083.969154420725!2d-80.8446797599315!3d27.38975750941141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88dc27a834646b13%3A0xda7a3d4653b9875e!2s1800%20NW%20160th%20St%2C%20Okeechobee%2C%20FL%2034972%2C%20USA!5e0!3m2!1sen!2sin!4v1763465119937!5m2!1sen!2sin"
             style={{ border: 0 }}
             allowFullScreen=""
             loading="lazy"
@@ -226,7 +226,7 @@ const ContactPage = () => {
           ></iframe>
         </div>
 
-        <div className="brand__logo--section section--padding pt-0">
+        {/* <div className="brand__logo--section section--padding pt-0">
           <div className="container">
             <div className="row row-cols-1">
               <div className="col">
@@ -244,7 +244,7 @@ const ContactPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <ShippingInfo />
       </main>
