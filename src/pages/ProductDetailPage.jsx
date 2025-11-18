@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Breadcrumb from '../components/Breadcrumb';
 import ShippingInfo from '../components/ShippingInfo';
 import Footer from '../components/Footer';
+import { useCart } from '../context/CartContext';
 
 const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
@@ -17,6 +18,7 @@ const ProductDetailPage = () => {
 
   const { id } = useParams();
   const productId = id;
+  const cart = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -179,7 +181,26 @@ const ProductDetailPage = () => {
                       <div style={{minWidth:28, textAlign:'center', fontWeight:600}}>{quantity}</div>
                       <button type="button" onClick={() => setQuantity(q => q + 1)}>+</button>
                     </div>
-                    <button className="pd-buy">BUY NOW</button>
+                    <button 
+                      className="pd-buy" 
+                      onClick={async () => {
+                        if (product) {
+                          try {
+                            // Create cart item with the selected quantity
+                            const cartItem = {
+                              ...product,
+                              quantiy: quantity
+                            };
+                            await cart.addItem(cartItem);
+                            console.log('Product added to cart');
+                          } catch (error) {
+                            console.error('Failed to add product to cart:', error);
+                          }
+                        }
+                      }}
+                    >
+                      Add to Cart
+                    </button>
                   </div>
 
                   <div className="pd-section">

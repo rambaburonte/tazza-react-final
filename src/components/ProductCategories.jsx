@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { API_CONFIG } from '../config/apiConfig';
@@ -9,6 +9,7 @@ import { useHome } from '../context/HomeContext';
 
 const ProductCategories = () => {
   const { homeData, loading, error } = useHome();
+  const navigate = useNavigate();
   const { categories } = homeData;
 
   // Map categories for display
@@ -113,7 +114,28 @@ const ProductCategories = () => {
               <SwiperSlide key={category.id}>
                 <div className="product__items product__bg">
                   <div className="product__items--thumbnail">
-                    <Link className="product__items--link" to={`/shop?category=${category.id}&catName=${encodeURIComponent(category.name)}`}>
+                    <Link
+                      className="product__items--link"
+                      to="/shop"
+                      onClick={(e) => {
+                        const now = Date.now();
+                        // store per-component last click time
+                        if (!window.__lastProductCategoryClick) window.__lastProductCategoryClick = 0;
+                        if (now - window.__lastProductCategoryClick < 400) {
+                          e.preventDefault();
+                          return;
+                        }
+                        window.__lastProductCategoryClick = now;
+
+                        e.preventDefault();
+                        // navigate using router state instead of query string
+                        const nav = navigate || null;
+                        if (nav) {
+                          nav('/shop', { state: { category: category.id, catName: category.name } });
+                        }
+                      }}
+                      onDoubleClick={(e) => { e.preventDefault(); }}
+                    >
                       <img 
                         className="product__items--img" 
                         src={`${API_CONFIG.IMAGE_URL}${category.image}`} 
