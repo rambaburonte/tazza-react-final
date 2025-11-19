@@ -14,6 +14,8 @@ import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import LoginPage from './pages/LoginPage';
 import ShopPage from './pages/ShopPage';
+import InSeasonPage from './pages/InSeasonPage';
+import FreshProducePage from './pages/FreshProducePage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -38,6 +40,8 @@ function App() {
                   <Route path="/faq" element={<FAQPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/shop" element={<ShopPage />} />
+                  <Route path="/inseason" element={<InSeasonPage />} />
+                  <Route path="/freshproduce" element={<FreshProducePage />} />
                   <Route path="/shop-grid" element={<ShopPage />} />
                   <Route path="/shop-list" element={<ShopPage />} />
                   <Route path="/shop-grid-list" element={<ShopPage />} />

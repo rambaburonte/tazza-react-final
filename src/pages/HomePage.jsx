@@ -22,8 +22,8 @@ const HomePage = () => {
         
         <BannerSection />
         <DealsBanner />
-        <BlogSection />
-        <TestimonialSection />
+        {/* <BlogSection />
+        <TestimonialSection /> */}
         <ShippingInfo />
       </main>
       

@@ -80,6 +80,22 @@ const Header = () => {
     };
   }, [searchQuery]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -193,10 +209,10 @@ const Header = () => {
                       <Link className="header__menu--link" to="/">Home</Link>
                     </li>
                     <li className="header__menu--items">
-                      <Link className="header__menu--link" to="/season">In Season</Link>
+                      <Link className="header__menu--link" to="/inseason">In Season</Link>
                     </li>
                     <li className="header__menu--items">
-                      <Link className="header__menu--link" to="/produce">Fresh Produce</Link>
+                      <Link className="header__menu--link" to="/freshproduce">Fresh Produce</Link>
                     </li>
                     <li className="header__menu--items">
                       <Link className="header__menu--link" to="/shipping">Shipping</Link>
@@ -481,10 +497,10 @@ const Header = () => {
                         <Link className="header__menu--link text-white" to="/">Home</Link>
                       </li>
                       <li className="header__menu--items">
-                        <Link className="header__menu--link text-white" to="/season">In Season</Link>
+                        <Link className="header__menu--link text-white" to="/inseason">In Season</Link>
                       </li>
                       <li className="header__menu--items">
-                        <Link className="header__menu--link text-white" to="/produce">Fresh Produce</Link>
+                        <Link className="header__menu--link text-white" to="/freshproduce">Fresh Produce</Link>
                       </li>
                       <li className="header__menu--items">
                         <Link className="header__menu--link text-white" to="/shipping">Shipping</Link>
@@ -524,8 +540,8 @@ const Header = () => {
             <nav className="offcanvas__menu">
               <ul className="offcanvas__menu_ul">
                 <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/">Home</Link></li>
-                <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/season">In Season</Link></li>
-                <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/produce">Fresh Produce</Link></li>
+                <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/inseason">In Season</Link></li>
+                <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/freshproduce">Fresh Produce</Link></li>
                 <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/shipping">Shipping</Link></li>
                 <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/about">About Us</Link></li>
                 <li className="offcanvas__menu_li"><Link className="offcanvas__menu_item" to="/contact">Contact</Link></li>
